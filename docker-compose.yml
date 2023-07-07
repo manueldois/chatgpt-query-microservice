@@ -1,0 +1,14 @@
+version: '3.4'
+services:
+  server:
+    container_name: waitroom-server
+    restart: always
+    build:
+      context: ./server
+      dockerfile: dockerfile
+      args:
+        - PORT = 3000
+    ports:
+      - ${SERVER_PORT}:3000
+    volumes:
+      - ./server/src:/home/node/app/src
