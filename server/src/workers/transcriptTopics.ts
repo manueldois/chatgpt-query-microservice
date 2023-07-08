@@ -26,12 +26,12 @@ export const TranscriptTopicsWorker = new Worker('transcriptTopics', async (job)
     return { openAIResponse: response.data.choices[0].message.content }
 }, {
     connection: {
-        port: 6379,
-        host: '0.0.0.0'
+        port: parseInt(process.env.REDIS_PORT),
+        host: process.env.REDIS_HOST
     },
     limiter: {
-        max: 1,
-        duration: 30000
+        max: parseInt(process.env.JOB_MAX_REQUESTS_PER_SEC,10),
+        duration: 1000
     }
 }
 );

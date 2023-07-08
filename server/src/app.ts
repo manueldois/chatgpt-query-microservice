@@ -22,7 +22,7 @@ sequelize.authenticate()
     .then(async () => {
         console.log('Connection to DB has been established successfully.');
 
-        await TranscriptTopics.sync({ force: true })
+        await TranscriptTopics.sync()
 
         app.listen(
             3000,
