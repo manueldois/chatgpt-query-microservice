@@ -1,30 +1,29 @@
+import 'dotenv/config'
+import './workers/transcriptTopics'
 import express from 'express'
 import asyncHandler from 'express-async-handler'
 import { sequelize } from './models';
-import { TranscriptTopics } from './models/TranscriptTopics';
-import { TranscriptTopicsQueue } from './queues/TranscriptTopics'
-import './workers/TranscriptTopics'
+import { TranscriptTopics } from './models/transcriptTopics';
+import { getTranscript, getTranscriptStatus, getTranscripts, postTranscript } from './controllers/transcripts';
 
 const app: express.Application = express();
 
 app.use(express.json())
 
-app.post('/transcripts', asyncHandler(async (req, res, next) => {
-    const { transcript } = req.body
+app.post('/transcripts', asyncHandler(postTranscript))
 
-    if (!transcript || typeof transcript !== 'string') {
-        throw new Error('Missing transcript')
-    }
+app.get('/transcripts', asyncHandler(getTranscripts))
 
-    TranscriptTopicsQueue.add('transcript', { request: req.body.transcript })
+app.get('/transcripts/:id', asyncHandler(getTranscript))
 
-    res.sendStatus(200)
-}))
+app.get('/transcripts/:id/status', asyncHandler(getTranscriptStatus))
 
 sequelize.authenticate()
     .then(async () => {
-        console.log('Connection has been established successfully.');
+        console.log('Connection to DB has been established successfully.');
+
         await TranscriptTopics.sync({ force: true })
+
         app.listen(
             3000,
             () => {
