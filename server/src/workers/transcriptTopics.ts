@@ -1,12 +1,10 @@
 import { Job, UnrecoverableError, Worker } from 'bullmq'
-import { TranscriptTopics } from '../models/transcriptTopics';
-import { sequelize } from '../models';
-import { openai } from '../services/openai';
+import { container } from '../container';
 
 export const TranscriptTopicsWorker = new Worker('transcriptTopics', async (job) => {
     const { transcript } = job.data
 
-    const response = await openai.createChatCompletion({
+    const response = await container.resolve('openai').createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: `Return the main topics from the following text: ${transcript}` }],
     });
@@ -35,12 +33,12 @@ export const TranscriptTopicsWorker = new Worker('transcriptTopics', async (job)
     }
 }
 );
-// 
+
 TranscriptTopicsWorker.on('completed', async (job: Job, { openAIResponse }: { openAIResponse: string }) => {
     try {
-        await sequelize.authenticate()
+        await container.resolve('sequelize').authenticate()
 
-        await TranscriptTopics.update({
+        await container.resolve('TranscriptTopics').update({
             jobId: job.id,
             openAIResponse: openAIResponse,
             status: "COMPLETE"
@@ -56,9 +54,9 @@ TranscriptTopicsWorker.on('completed', async (job: Job, { openAIResponse }: { op
 
 TranscriptTopicsWorker.on('failed', async (job: Job, error: Error) => {
     try {
-        await sequelize.authenticate()
+        await container.resolve('sequelize').authenticate()
 
-        await TranscriptTopics.update({
+        await container.resolve('TranscriptTopics').update({
             jobId: job.id,
             status: "ERROR",
             error: error.message
@@ -71,3 +69,4 @@ TranscriptTopicsWorker.on('failed', async (job: Job, error: Error) => {
         console.error(error)
     }
 });
+
