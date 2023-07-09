@@ -1,8 +1,7 @@
-import { Configuration, OpenAIApi } from 'openai'
-import fs from 'fs'
+import { OpenAIApi } from 'openai'
 
-const configuration = new Configuration({
-    apiKey: fs.readFileSync(process.env.OPENAI_API_KEY_FILE).toString(),
-});
+export let openai: OpenAIApi
 
-export const openai = new OpenAIApi(configuration);
+export function initOpenAI(_openAI: OpenAIApi){
+    openai = _openAI
+}

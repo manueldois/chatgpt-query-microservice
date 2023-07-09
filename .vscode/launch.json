@@ -18,7 +18,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Server: test",
+            "name": "Server: dev test",
             "autoAttachChildProcesses": true,
             "skipFiles": [
                 "<node_internals>/**",
@@ -26,7 +26,6 @@
             ],
             "program": "${workspaceRoot}/server/node_modules/vitest/vitest.mjs",
             "args": [
-                "run",
                 "${workspaceRoot}/server/tests"
             ],
             "smartStep": true,

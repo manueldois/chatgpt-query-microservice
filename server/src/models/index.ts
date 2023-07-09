@@ -1,11 +1,12 @@
 import { Sequelize } from "sequelize";
-import path from 'path'
-import { InitTranscriptTopics } from "./transcriptTopics";
+import { initTranscriptTopics, TranscriptTopics } from "./transcriptTopics";
 
-export const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: path.join(__dirname, '../../data/db.sqlite'),
-    logging: false,
-});
+export let sequelize: Sequelize
 
-InitTranscriptTopics(sequelize)
+export async function initSequelize(_sequelize: Sequelize) {
+    sequelize = _sequelize
+
+    initTranscriptTopics(_sequelize)
+
+    await TranscriptTopics.sync()
+}

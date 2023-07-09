@@ -2,7 +2,7 @@ import { DataTypes, Model, ModelStatic, Sequelize } from "sequelize";
 
 export let TranscriptTopics: ModelStatic<Model<any, any>>
 
-export const InitTranscriptTopics = (sequelize: Sequelize) => {
+export const initTranscriptTopics = (sequelize: Sequelize) => {
     const Model = sequelize.define('transcriptTopics', {
         jobId: {
             type: DataTypes.STRING,
