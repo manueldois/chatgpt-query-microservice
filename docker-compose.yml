@@ -3,12 +3,33 @@ services:
   server:
     container_name: waitroom-server
     restart: always
+    environment:
+      PORT: 3000
+      REDIS_PORT: 6379
+      REDIS_HOST: waitroom-redis
+      JOB_MAX_ATTEMPTS: 3
+      JOB_MAX_REQUESTS_PER_SEC: 5
+      OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
     build:
       context: ./server
-      dockerfile: dockerfile
-      args:
-        - PORT = 3000
+      dockerfile: dockerfile        
     ports:
-      - ${SERVER_PORT}:3000
+      - 3000:3000
     volumes:
-      - ./server/src:/home/node/app/src
+      - db:/home/node/app/data
+    secrets:
+      - openai_api_key
+
+  redis:
+    container_name: waitroom-redis
+    restart: always
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
+  
+volumes:
+  db:
+
+secrets:
+  openai_api_key: 
+    file: ./secrets/openai_api_key.txt

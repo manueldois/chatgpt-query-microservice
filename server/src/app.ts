@@ -8,6 +8,8 @@ import { getTranscript, getTranscriptStatus, getTranscripts, postTranscript } fr
 
 const app: express.Application = express();
 
+console.log("OPENAI_API_KEY_FILE: ", process.env.OPENAI_API_KEY_FILE)
+
 app.use(express.json())
 
 app.post('/transcripts', asyncHandler(postTranscript))
