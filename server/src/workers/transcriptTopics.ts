@@ -1,23 +1,25 @@
 import { Job, UnrecoverableError, Worker } from 'bullmq'
-import { container } from '../container';
+import { TranscriptTopics } from '../models/transcriptTopics';
+import { openai } from '../services/openai';
+import { sequelize } from '../services/sequelize';
 
 export const TranscriptTopicsWorker = new Worker('transcriptTopics', async (job) => {
     const { transcript } = job.data
 
-    const response = await container.resolve('openai').createChatCompletion({
+    const response = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: `Return the main topics from the following text: ${transcript}` }],
     });
 
     if (response.status !== 200) {
         const errorMessage = `Error processing job: ${job.data.id} --- ${response.status}: ${response.statusText}`
-        
+
         console.error(errorMessage)
 
         if (response.status === 429 || response.status === 500 || response.status === 503) {
             throw new Error(errorMessage)
         } else {
-            throw new UnrecoverableError(errorMessage)            
+            throw new UnrecoverableError(errorMessage)
         }
     }
 
@@ -28,7 +30,7 @@ export const TranscriptTopicsWorker = new Worker('transcriptTopics', async (job)
         host: process.env.REDIS_HOST
     },
     limiter: {
-        max: parseInt(process.env.JOB_MAX_REQUESTS_PER_SEC,10),
+        max: parseInt(process.env.JOB_MAX_REQUESTS_PER_SEC, 10),
         duration: 1000
     }
 }
@@ -36,9 +38,9 @@ export const TranscriptTopicsWorker = new Worker('transcriptTopics', async (job)
 
 TranscriptTopicsWorker.on('completed', async (job: Job, { openAIResponse }: { openAIResponse: string }) => {
     try {
-        await container.resolve('sequelize').authenticate()
+        await sequelize.authenticate()
 
-        await container.resolve('TranscriptTopics').update({
+        await TranscriptTopics.update({
             jobId: job.id,
             openAIResponse: openAIResponse,
             status: "COMPLETE"
@@ -54,9 +56,9 @@ TranscriptTopicsWorker.on('completed', async (job: Job, { openAIResponse }: { op
 
 TranscriptTopicsWorker.on('failed', async (job: Job, error: Error) => {
     try {
-        await container.resolve('sequelize').authenticate()
+        await sequelize.authenticate()
 
-        await container.resolve('TranscriptTopics').update({
+        await TranscriptTopics.update({
             jobId: job.id,
             status: "ERROR",
             error: error.message

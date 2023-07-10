@@ -3,16 +3,10 @@ import './workers/transcriptTopics'
 import express from 'express'
 import asyncHandler from 'express-async-handler'
 import { getTranscript, getTranscriptStatus, getTranscripts, postTranscript } from './controllers/transcripts';
-import { DependenciesContainer, setContainer, container } from './container';
+import { TranscriptTopics } from './models/transcriptTopics';
+import { sequelize } from './services/sequelize';
 
-export async function createApp(injectedContainer?: DependenciesContainer) {
-    if (injectedContainer) {
-        setContainer(injectedContainer)
-    }
-
-    const sequelize = container.resolve('sequelize')
-    const TranscriptTopics = container.resolve('TranscriptTopics')
-
+export async function createApp() {
     try {
         await sequelize.authenticate()
         await TranscriptTopics.sync()

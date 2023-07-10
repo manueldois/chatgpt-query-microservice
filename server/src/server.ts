@@ -1,9 +1,8 @@
 import 'dotenv/config'
 import { createApp } from "./app";
-import { DependenciesContainer } from './container';
 
-export async function createServer(injectedContainer?: DependenciesContainer) {
-    const app = await createApp(injectedContainer)
+export async function createServer() {
+    const app = await createApp()
 
     return app.listen(
         3000,

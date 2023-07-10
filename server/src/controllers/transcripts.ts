@@ -1,4 +1,4 @@
-import { container } from "../container"
+import { TranscriptTopics } from "../models/transcriptTopics"
 import { TranscriptTopicsQueue } from "../queues/transcriptTopics"
 import { hashTranscript } from "../services/transcriptTopics"
 
@@ -6,8 +6,6 @@ export const postTranscript = async (req, res) => {
     // There is no concurrency protection for this endpoint
     // There could be, but implementation depends on the database,
     // and it's probably unnecessary for such a simple service
-
-    const TranscriptTopics = container.resolve('TranscriptTopics')
 
     const { transcript } = req.body
 
@@ -37,8 +35,6 @@ export const postTranscript = async (req, res) => {
 }
 
 export const getTranscripts = async (req, res) => {
-    const TranscriptTopics = container.resolve('TranscriptTopics')
-
     const transcripts = await TranscriptTopics.findAll({})
 
     res.json(transcripts)
@@ -46,8 +42,6 @@ export const getTranscripts = async (req, res) => {
 
 export const getTranscript = async (req, res) => {
     const { id } = req.params
-
-    const TranscriptTopics = container.resolve('TranscriptTopics')
 
     const transcript = await TranscriptTopics.findOne({ where: { id } })
 
@@ -60,8 +54,6 @@ export const getTranscript = async (req, res) => {
 
 export const getTranscriptStatus = async (req, res) => {
     const { id } = req.params
-
-    const TranscriptTopics = container.resolve('TranscriptTopics')
 
     const transcript = await TranscriptTopics.findOne({ where: { id } })
 
