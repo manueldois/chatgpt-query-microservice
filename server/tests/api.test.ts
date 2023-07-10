@@ -1,15 +1,12 @@
-import { assert, describe, expect, it } from 'vitest'
+import 'dotenv/config'
+import { describe, it } from 'vitest';
+import request from 'supertest'
+import { createApp } from '../src/app'
+
+const app = await createApp()
 
 describe('API tests', () => {
-  it('foo', () => {
-    assert.equal(Math.sqrt(4), 2)
-  })
-
-  it('bar', () => {
-    expect(1 + 1).eq(2)
-  })
-
-  it('snapshot', () => {
-    expect({ foo: 'bar' }).toMatchSnapshot()
+  it('Gets transcripts', () => {
+    request(app).get('/transcripts').expect(200)
   })
 })

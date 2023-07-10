@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import './workers/transcriptTopics'
 import express from 'express'
 import asyncHandler from 'express-async-handler'

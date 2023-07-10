@@ -20,15 +20,12 @@
             "request": "launch",
             "name": "Server: dev test",
             "autoAttachChildProcesses": true,
-            "skipFiles": [
-                "<node_internals>/**",
-                "**/node_modules/**"
+            "cwd": "${workspaceRoot}/server",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "dev:test"
             ],
-            "program": "${workspaceRoot}/server/node_modules/vitest/vitest.mjs",
-            "args": [
-                "${workspaceRoot}/server/tests"
-            ],
-            "smartStep": true,
             "console": "integratedTerminal"
         }
     ]
