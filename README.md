@@ -33,7 +33,7 @@ Vitest is used to provide extensive integration test coverage
 
 The project requires an OpenAI API key
 
-`mkdir secrets && echo <OPENAI_API_KEY> > ./secrets/openai_api_key.txt `
+`mkdir secrets && echo "<OPENAI_API_KEY>" > ./secrets/openai_api_key.txt `
 
 `docker-compose -f docker-compose.yml up`
 
