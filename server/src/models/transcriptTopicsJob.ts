@@ -6,8 +6,10 @@ export const TranscriptTopicsJob = sequelize.define('transcriptTopicsJob', {
         type: DataTypes.STRING,
     },
     status: {
-        type: DataTypes.STRING,
-        allowNull: false
+        type: DataTypes.ENUM,
+        allowNull: false,
+        values: ['PENDING', 'COMPLETE', 'ERROR'],
+        defaultValue: 'PENDING'
     },
     error: {
         type: DataTypes.STRING,
