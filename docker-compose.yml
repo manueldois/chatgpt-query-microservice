@@ -9,6 +9,7 @@ services:
       REDIS_HOST: waitroom-redis
       JOB_MAX_ATTEMPTS: 3
       JOB_MAX_REQUESTS_PER_SEC: 5
+      JOB_BACKOFF_DELAY: 1000
       OPENAI_API_KEY_FILE: /run/secrets/openai_api_key
     build:
       context: ./server

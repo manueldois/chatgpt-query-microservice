@@ -9,7 +9,7 @@ export const TranscriptTopicsQueue = new Queue('transcriptTopics', {
         attempts: parseInt(process.env.JOB_MAX_ATTEMPTS, 10),
         backoff: {
             type: 'exponential',
-            delay: 1000,
+            delay: parseInt(process.env.JOB_BACKOFF_DELAY, 10),
         },
     },
 });

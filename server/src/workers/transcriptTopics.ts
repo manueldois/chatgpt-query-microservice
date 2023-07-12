@@ -12,26 +12,29 @@ export const TranscriptTopicsWorker = new Worker('transcriptTopics', async (job)
     });
 
     if (response.status !== 200) {
-        const errorMessage = `Error processing job: ${job.data.id} --- ${response.status}: ${response.statusText}`
+        const errorMessage = `Error processing job: ${job.data.id} --- Status code: ${response.status}`
 
         console.error(errorMessage)
 
-        if (response.status === 429 || response.status === 500 || response.status === 503) {
-            throw new Error(errorMessage)
-        } else {
+        const unrecoverableErrors = [401, 500, 503]
+
+        if (unrecoverableErrors.includes(response.status)) {
             throw new UnrecoverableError(errorMessage)
+        } else {
+            throw new Error(errorMessage)
         }
     }
 
     return { openAIResponse: response.data.choices[0].message.content }
 }, {
     connection: {
-        port: parseInt(process.env.REDIS_PORT),
+        port: parseInt(process.env.REDIS_PORT, 10),
         host: process.env.REDIS_HOST
     },
     limiter: {
-        max: parseInt(process.env.JOB_MAX_REQUESTS_PER_SEC, 10),
-        duration: 1000
+        max: 1,
+        // Add an error margin of 10% bellow max requests
+        duration: 1.1 * (1000 / parseInt(process.env.JOB_MAX_REQUESTS_PER_SEC, 10))
     }
 }
 );
