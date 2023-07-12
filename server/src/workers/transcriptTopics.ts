@@ -1,5 +1,5 @@
 import { Job, UnrecoverableError, Worker } from 'bullmq'
-import { TranscriptTopics } from '../models/transcriptTopics';
+import { TranscriptTopicsJob } from '../models/transcriptTopicsJob';
 import { openai } from '../services/openai';
 import { sequelize } from '../services/sequelize';
 
@@ -43,7 +43,7 @@ TranscriptTopicsWorker.on('completed', async (job: Job, { openAIResponse }: { op
     try {
         await sequelize.authenticate()
 
-        await TranscriptTopics.update({
+        await TranscriptTopicsJob.update({
             jobId: job.id,
             openAIResponse: openAIResponse,
             status: "COMPLETE"
@@ -61,7 +61,7 @@ TranscriptTopicsWorker.on('failed', async (job: Job, error: Error) => {
     try {
         await sequelize.authenticate()
 
-        await TranscriptTopics.update({
+        await TranscriptTopicsJob.update({
             jobId: job.id,
             status: "ERROR",
             error: error.message

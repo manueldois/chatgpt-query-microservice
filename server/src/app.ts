@@ -2,14 +2,14 @@ import 'dotenv/config'
 import './workers/transcriptTopics'
 import express from 'express'
 import asyncHandler from 'express-async-handler'
-import { getTranscript, getTranscriptStatus, getTranscripts, postTranscript } from './controllers/transcripts';
-import { TranscriptTopics } from './models/transcriptTopics';
+import { getTranscriptTopicJob, getTranscriptTopicStatus, getTranscriptTopicJobs, postTranscriptTopicsJob } from './controllers/transcriptTopicsJob';
+import { TranscriptTopicsJob } from './models/transcriptTopicsJob';
 import { sequelize } from './services/sequelize';
 
 export async function createApp() {
     try {
         await sequelize.authenticate()
-        await TranscriptTopics.sync()
+        await TranscriptTopicsJob.sync()
     } catch (error) {
         console.error('Unable to connect to the database:', error);
         process.exit(1)
@@ -21,13 +21,13 @@ export async function createApp() {
 
     app.use(express.json())
 
-    app.post('/transcripts', asyncHandler(postTranscript))
+    app.post('/transcript-topics-job', asyncHandler(postTranscriptTopicsJob))
 
-    app.get('/transcripts', asyncHandler(getTranscripts))
+    app.get('/transcript-topics-job', asyncHandler(getTranscriptTopicJobs))
 
-    app.get('/transcripts/:id', asyncHandler(getTranscript))
+    app.get('/transcript-topics-job/:id', asyncHandler(getTranscriptTopicJob))
 
-    app.get('/transcripts/:id/status', asyncHandler(getTranscriptStatus))
+    app.get('/transcript-topics-job/:id/status', asyncHandler(getTranscriptTopicStatus))
 
     return app
 }

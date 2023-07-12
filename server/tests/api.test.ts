@@ -2,7 +2,7 @@ import 'dotenv/config'
 import { Mock, beforeEach, describe, expect, it, vi } from 'vitest';
 import request from 'supertest'
 import { createApp } from '../src/app'
-import { TranscriptTopics } from '../src/models/transcriptTopics';
+import { TranscriptTopicsJob } from '../src/models/transcriptTopicsJob';
 import { openai } from '../src/services/openai';
 import { CreateChatCompletionResponse } from 'openai';
 import { AxiosResponse } from 'axios'
@@ -34,23 +34,23 @@ const timeToDoMaxAttempts = 2 ** (maxAttempts - 1) * delay
 
 describe('API tests', () => {
   beforeEach(async () => {
-    await TranscriptTopics.destroy({ where: {} })
+    await TranscriptTopicsJob.destroy({ where: {} })
     vi.resetAllMocks()
   })
 
   it('Responds with 400 on POST /transcript without transcript body', async () => {
-    const res = await request(app).post('/transcripts')
+    const res = await request(app).post('/transcript-topics-job')
       .send({ notATranscript: 'void' })
     expect(res.statusCode).toBe(400)
   })
 
   it('Responds with 404 on GET /transcript/:id for missing ids', async () => {
-    const res = await request(app).get('/transcript/1000')
+    const res = await request(app).get('/transcript-topics-job/1000')
     expect(res.status).toBe(404)
   })
 
   it('Responds with 404 on GET /transcript/:id/status for missing ids', async () => {
-    const res = await request(app).get('/transcript/status/1000')
+    const res = await request(app).get('/transcript-topics-job/status/1000')
     expect(res.status).toBe(404)
   })
 
@@ -72,16 +72,16 @@ describe('API tests', () => {
     })
 
     const resPostFirst = await request(app)
-      .post('/transcripts')
+      .post('/transcript-topics-job')
       .send({ transcript: "This is a text about apples" })
 
     await setTimeoutAsync(200)
 
-    const resGetFirst = await request(app).get(`/transcripts/${resPostFirst.body.id}`)
+    const resGetFirst = await request(app).get(`/transcript-topics-job/${resPostFirst.body.id}`)
     expect(resGetFirst.body).toMatchObject({ status: 'COMPLETE' })
 
     const resPostSecond = await request(app)
-      .post('/transcripts')
+      .post('/transcript-topics-job')
       .send({ transcript: "This is a text about apples" })
 
     expect(resPostSecond.body.id).toBe(resPostFirst.body.id)
@@ -101,12 +101,12 @@ describe('API tests', () => {
     })
 
     const resPost = await request(app)
-      .post('/transcripts')
+      .post('/transcript-topics-job')
       .send({ transcript: "This is a text about apples" })
 
     await setTimeoutAsync(200)
 
-    const resGet = await request(app).get(`/transcripts/${resPost.body.id}`)
+    const resGet = await request(app).get(`/transcript-topics-job/${resPost.body.id}`)
     expect(resGet.body).toMatchObject({ status: 'ERROR' })
 
     expect((openai.createChatCompletion as Mock)).toHaveBeenCalledOnce()
@@ -142,12 +142,12 @@ describe('API tests', () => {
     })
 
     const resPost = await request(app)
-      .post('/transcripts')
+      .post('/transcript-topics-job')
       .send({ transcript: "This is a text about apples" })
 
     await setTimeoutAsync(timeToDoMaxAttempts + 1000)
 
-    const resGet = await request(app).get(`/transcripts/${resPost.body.id}`)
+    const resGet = await request(app).get(`/transcript-topics-job/${resPost.body.id}`)
     expect(resGet.body).toMatchObject({ status: 'COMPLETE' })
 
     expect((openai.createChatCompletion as Mock)).toHaveBeenCalledTimes(maxAttempts)
@@ -178,13 +178,13 @@ describe('API tests', () => {
 
     for (let i = 0; i < 5; i++) {
       await request(app)
-        .post('/transcripts')
+        .post('/transcript-topics-job')
         .send({ transcript: "This is a text about apples " + i })
     }
 
     await setTimeoutAsync(1200)
 
-    const resGet = await request(app).get(`/transcripts`)
+    const resGet = await request(app).get(`/transcript-topics-job`)
 
     resGet.body.map(job => expect(job).toMatchObject({ status: 'COMPLETE' }))
 
@@ -218,21 +218,21 @@ describe('API tests', () => {
     })
 
     await request(app)
-      .post('/transcripts')
+      .post('/transcript-topics-job')
       .send({ transcript: "This is a text about apples" })
 
-    const resQueued = await request(app).get('/transcripts')
+    const resQueued = await request(app).get('/transcript-topics-job')
 
     expect(resQueued.body).toHaveLength(1)
     expect(resQueued.body[0]).toMatchObject({ status: 'QUEUED' })
 
     await setTimeoutAsync(200)
 
-    const resComplete = await request(app).get(`/transcripts/${resQueued.body[0].id}`)
+    const resComplete = await request(app).get(`/transcript-topics-job/${resQueued.body[0].id}`)
 
     expect(resComplete.body).toMatchObject({ status: 'COMPLETE', openAIResponse: 'ChatGPT Response' })
 
-    const resCompleteStatus = await request(app).get(`/transcripts/${resQueued.body[0].id}/status`)
+    const resCompleteStatus = await request(app).get(`/transcript-topics-job/${resQueued.body[0].id}/status`)
 
     expect(resCompleteStatus.body).toMatchObject({ status: 'COMPLETE' })
   })

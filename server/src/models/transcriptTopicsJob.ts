@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../services/sequelize";
 
-export const TranscriptTopics = sequelize.define('transcriptTopics', {
+export const TranscriptTopicsJob = sequelize.define('transcriptTopicsJob', {
     jobId: {
         type: DataTypes.STRING,
     },
