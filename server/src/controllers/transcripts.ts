@@ -10,7 +10,8 @@ export const postTranscript = async (req, res) => {
     const { transcript } = req.body
 
     if (!transcript || typeof transcript !== 'string') {
-        throw new Error('Missing transcript')
+        res.sendStatus(400)
+        return
     }
 
     const transcriptHash = hashTranscript(transcript)
@@ -47,6 +48,7 @@ export const getTranscript = async (req, res) => {
 
     if (!transcript) {
         res.sendStatus(404)
+        return
     }
 
     res.json(transcript)
@@ -59,6 +61,7 @@ export const getTranscriptStatus = async (req, res) => {
 
     if (!transcript) {
         res.sendStatus(404)
+        return
     }
 
     res.json({ status: transcript.dataValues.status })
