@@ -33,7 +33,7 @@ Vitest is used to provide extensive integration test coverage
 
 The project requires an OpenAI API key
 
-`echo <OPENAI_API_KEY> > ./secrets/openai_api_key.txt `
+`mkdir secrets && echo <OPENAI_API_KEY> > ./secrets/openai_api_key.txt `
 
 `docker-compose -f docker-compose.yml up`
 
@@ -52,12 +52,12 @@ Default port `3000`
 
 `docker-compose -f docker-compose.dev.yml up`
 
-`cd server && npm run dev:debug`
+`cd server && npm i && npm run dev:debug`
 
 ## Tests
 
 Testing does NOT require an OpenAI API key
 
-`cd server && npm run dev:test`
+`cd server && npm i && npm run dev:test`
 
 (or use vscode debug console to launch and attach to server)
